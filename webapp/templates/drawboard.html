@@ -1,0 +1,42 @@
+<!-- https://codepen.io/Lachlandawson/pen/abmdyV -->
+
+{% extends "base.html" %}
+
+{% block content %}
+<script src="https://code.jquery.com/jquery-1.11.0.min.js" type="text/javascript" charset="utf-8"></script>
+
+<canvas	width="200" height="200" id="mainCanvas" style="border: 1px black solid;">
+
+</canvas>
+
+<script type="text/javascript">
+    var $canvas = $("canvas");
+    var context = $canvas[0].getContext("2d");
+    var lastEvent;
+    var mouseDown = false;
+
+    // On mouse events on the canvas
+    $canvas.mousedown(function (e) {
+        lastEvent = e;
+        mouseDown = true;
+    }).mousemove(function (e) {
+        // Draw lines
+        if (mouseDown) {
+            context.beginPath();
+            context.moveTo(lastEvent.offsetX, lastEvent.offsetY);
+            context.lineTo(e.offsetX, e.offsetY);
+            context.strokeStyle = "black";
+            context.lineWidth = 5;
+            context.lineCap = 'round';
+            context.stroke();
+            lastEvent = e;
+        }
+    }).mouseup(function () {
+        mouseDown = false;
+    }).mouseleave(function () {
+        $canvas.mouseup();
+    });
+
+</script>
+
+{% endblock %}
