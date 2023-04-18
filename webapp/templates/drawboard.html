@@ -4,6 +4,11 @@
 
 {% block content %}
 <script src="https://code.jquery.com/jquery-1.11.0.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+
+<script>
+    $SCRIPT_ROOT = {{ request.script_root|tojson }};
+  </script>
 
 <canvas	width="200" height="200" id="mainCanvas" style="border: 1px black solid;">
 
@@ -26,17 +31,36 @@
             context.moveTo(lastEvent.offsetX, lastEvent.offsetY);
             context.lineTo(e.offsetX, e.offsetY);
             context.strokeStyle = "black";
-            context.lineWidth = 5;
+            context.lineWidth = 10;
             context.lineCap = 'round';
             context.stroke();
             lastEvent = e;
         }
     }).mouseup(function () {
+        // https://www.bogotobogo.com/python/Flask/Python_Flask_with_AJAX_JQuery.php
         mouseDown = false;
+        var dataURL = $canvas[0].toDataURL();
+        console.log(dataURL);
+        $.ajax({
+			url: '/send_img',
+			data: dataURL,
+			type: 'POST',
+			success: function(response){
+				console.log(response);
+                $("#result").text("KNN result: " + response.KNN + " \n " + "SVC result: " + response.SVC);
+			},
+			error: function(error){
+				console.log(error);
+			}
+		});
     }).mouseleave(function () {
         $canvas.mouseup();
+        var dataURL = $canvas[0].toDataURL();
     });
 
 </script>
 
+<div id="result" style="white-space: pre-line;">
+text
+</div>
 {% endblock %}
