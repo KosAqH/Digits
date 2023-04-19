@@ -49,3 +49,7 @@ def zoom_image(img: np.array, zoom: float = 1):
 
     pil_img = pil_img.resize((w, h), Image.LANCZOS)
     return np.array(pil_img)
+
+def add_noise(img: np.array, max_noise_level: int = 0):
+    new_img = img + np.random.randint(0, max_noise_level, size = img.shape)
+    return new_img
