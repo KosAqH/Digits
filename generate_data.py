@@ -1,9 +1,11 @@
 ## Script for generate more data through some transformation
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt # only for testing
+# import matplotlib.pyplot as plt # only for testing
+import itertools
 
-import os
+# import os
+import json
 from datetime import datetime
 
 from img_manipulation import *
@@ -14,8 +16,8 @@ def load_data(filename: str = "Data\\train.csv"):
     y = df['label'].copy().values
     return (X, y)
 
-def generate_filename(prefix: str = "train"):
-    s = f"{prefix} {datetime.today().strftime(r'%Y-%m-%d %H-%M-%S')}.csv"
+def generate_filename(prefix: str = "train", extension = ".csv"):
+    s = f"{prefix} {datetime.today().strftime(r'%Y-%m-%d %H-%M-%S')}{extension}"
     return s
 
 def save_data(X, y):
@@ -23,11 +25,16 @@ def save_data(X, y):
     columns = []
     for i in range(len(X[0].flatten())):
         columns.append(f'pixel{i}')
-    
+
     df = pd.DataFrame(X, columns=columns)
     df.insert(0, "label", y)
 
     df.to_csv(filename, index=False)
+
+def save_combinations(c):
+    fname = generate_filename(prefix="combinations")
+    with open(fname, "w") as f:
+        json.dump(c,f)
 
 def run_transformation(img, transformation_type: str = "rotate", val = None):
     if transformation_type == "rotate":
@@ -54,8 +61,8 @@ def run_transformation(img, transformation_type: str = "rotate", val = None):
         else:
             raise Exception("Wrong type of val. It should be float.")
     else:
-        raise Exception("Wrong type of transformation")
-
+        raise Exception(f"Wrong type of transformation: {transformation_type}")
+    
     return new_img
 
 def modify_img(img, transformations: dict):
@@ -64,18 +71,26 @@ def modify_img(img, transformations: dict):
     for k in transformations.keys():
         m_img = run_transformation(m_img, k, transformations[k])
 
-    return m_img
+    return m_img.flatten()
 
+def generate_combinations(d):
+    keys, values = zip(*d.items())
+    permutations_dicts = [dict(zip(keys, v)) for v in itertools.product(*values)]
+    return permutations_dicts
 
-def process_image(img):
+def process_image(img, combinations):
     modified_imgs = []
-    modified_imgs.append(modify_img(img, {"rotate" : 90, "shift" : (3, -3), "noise" : 25}).flatten())
-
+    for c in combinations:
+        modified_imgs.append(modify_img(img, c))
     return modified_imgs
 
 if __name__ == "__main__":
     w = 28
     h = 28
+
+    c = []
+    c += generate_combinations({ "zoom": [0.8, 1.], "rotate": [10, 20, -10, -20], "shift": [(0,4), (4,0), (0,-4), (-4, 0), (4,4), (-4,-4), (-4,4), (4,-4)]})
+    c += generate_combinations({ "zoom": [1.25, 1.5], "rotate": [10, -10]})
 
     ## Load all data
     X, y = load_data()
@@ -85,12 +100,14 @@ if __name__ == "__main__":
 
     for i, label in enumerate(y):
         img = X[i].reshape(w, h)
-        modified_imgs = process_image(img)
+        modified_imgs = process_image(img, c)
         l = len(modified_imgs)
         new_X += modified_imgs
         new_y += l * [label]
         
+        
     ## Save data
     save_data(new_X, new_y)
+    save_combinations(c)
     
 
