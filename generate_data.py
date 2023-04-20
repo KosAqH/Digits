@@ -29,6 +29,8 @@ def save_data(X, y):
     df = pd.DataFrame(X, columns=columns)
     df.insert(0, "label", y)
 
+    print(df.info(verbose=False, memory_usage="deep"))
+
     df.to_csv(filename, index=False)
 
 def save_combinations(c):
@@ -105,9 +107,11 @@ if __name__ == "__main__":
         new_X += modified_imgs
         new_y += l * [label]
         
+        if i % 100 == 0:
+            print(i)
         
     ## Save data
-    save_data(new_X, new_y)
+    save_data(np.array(new_X), np.array(new_y))
     save_combinations(c)
     
 
