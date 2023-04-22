@@ -8,7 +8,7 @@ import pandas as pd
 import joblib
 
 if __name__ == "__main__":
-    df = pd.read_csv("Data\\train.csv")
+    df = pd.read_csv("Data\\train_zoomed.csv")
     
     seed = 0
     X = df.iloc[:, 1:].copy().values
@@ -16,11 +16,11 @@ if __name__ == "__main__":
 
     svc = SVC(C=0.1, gamma=1, kernel="poly")
     svc.fit(X, y)
-    joblib.dump(svc, "svc.joblib")
+    joblib.dump(svc, "svc_z.joblib")
     print("Saved SVC model")
 
     knn = KNeighborsClassifier(metric="minkowski", n_neighbors=5, weights="distance")
     knn.fit(X, y)
-    joblib.dump(knn, "knn.joblib")
+    joblib.dump(knn, "knn_z.joblib")
     print("Saved KNN model")
     
