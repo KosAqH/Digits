@@ -14,6 +14,8 @@
 
 </canvas>
 
+<button onclick="clear_canvas()"> Clear </button>
+
 <script type="text/javascript">
     var $canvas = $("canvas");
     var context = $canvas[0].getContext("2d");
@@ -46,8 +48,8 @@
 			data: dataURL,
 			type: 'POST',
 			success: function(response){
-				console.log(response.KNN);
-                $("#result").text("KNN result: " + response.predictment.KNN + " \n " + "SVC result: " + response.predictment.SVC + " \n " + "KNN zoomed result: " + response.predictment.KNN_Z + " \n " + "SVC zoomed result: " + response.predictment.SVC_Z);
+				console.log(response);
+                $("#result").text(JSON.stringify(response, null, 2));
             },
 			error: function(error){
 				console.log(error);
@@ -55,8 +57,14 @@
 		});
     }).mouseleave(function () {
         $canvas.mouseup();
-        var dataURL = $canvas[0].toDataURL();
+        //var dataURL = $canvas[0].toDataURL();
     });
+
+    function clear_canvas(){
+        console.log("S");
+        context.clearRect(0, 0, $canvas[0].width, $canvas[0].height);
+
+    }
 
 </script>
 
